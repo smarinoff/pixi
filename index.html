@@ -5,24 +5,84 @@
         <title>Hello World</title>
     </head>
     <script src="js/pixi.min.js"></script>
+    <style>* {padding: 0; margin: 0}</style>
     <body>
         <script type="text/javascript">
             let type = "WebGL";
                 if(!PIXI.utils.isWebGLSupported()){
                     type = "canvas";
                 }
-
-            PIXI.utils.sayHello(type);
             
             let app = new PIXI.Application({
-                width: 256,
-                height: 256,
+                width: 500,
+                height: 500,
                 antialias: true,
-                transparent: false,
                 resolution: 1
             });
             
+            let loader = PIXI.loader;
+            let tiles = [];
+            let textures = [];
+            let types = 10;
+            let rows = 12;
+            let cols = 11;
+            
+            loader.add("images/tiles.png")
+                .load(setup);
+            
             document.body.appendChild(app.view);
+            
+            function setup() {
+                
+                let base = PIXI.BaseTexture.fromImage("images/tiles.png");
+                
+                for (let t=0; t<types; t++) {
+                    let offset = 58-2;
+                    
+                    textures[t] = new PIXI.Texture(base, new PIXI.Rectangle(offset*t,0,58,66));
+                }
+                
+                for (let j=0; j < rows; j++) {
+                    for (let i=0; i<cols; i++) {
+                        let type = Math.floor(Math.random() * types);
+                        let tile = new PIXI.Sprite(textures[type]);
+                        
+                        let y = j*(tile.height - 26) + Math.floor(Math.random()*10);
+                        let x = i*(tile.width - 8);
+                        
+                        if (j % 2 != 0) x -= (tile.width - 8)/2;
+                        
+                        tile.position.set(x, y);
+                        tile.clicked = false;
+                        
+                        //Add interactivity
+                        tile.interactive = true;
+                        tile.on('pointerdown', function(){                   
+                            this.clicked = true;
+                        });
+                        
+                        app.stage.addChild(tile);
+                        tiles.push(tile);
+                        
+                    }
+                }
+                
+                //Run the game
+                app.ticker.add(delta => gameLoop(delta));
+            }
+            
+            function gameLoop(delta) {
+                for (let i=0; i<tiles.length; i++) {
+                    if (tiles[i].clicked) {
+                        tiles[i].y += 4;
+                        
+                        if (tiles[i].y > app.height) {
+                            app.stage.removeChild(tiles[i]);
+                            delete(tiles[i]);
+                        }
+                    }
+                }
+            }
         </script>
     </body>
 </html>
