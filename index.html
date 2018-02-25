@@ -24,7 +24,7 @@
             let tiles = [];
             let textures = [];
             let types = 10;
-            let rows = 12;
+            let rows = 13;
             let cols = 11;
             
             loader.add("images/tiles.png")
@@ -53,6 +53,7 @@
                         if (j % 2 != 0) x -= (tile.width - 8)/2;
                         
                         tile.position.set(x, y);
+                        tile.pivot.set(tile.width/2,tile.height/2);
                         tile.clicked = false;
                         
                         //Add interactivity
@@ -60,10 +61,17 @@
                         tile.on('pointerdown', function(){                   
                             this.clicked = true;
                         });
+                        tile.hitArea = new PIXI.Polygon(
+                            tile.width/2, 0,
+                            tile.width, tile.height * 0.2,
+                            tile.width, tile.height * 0.7,
+                            tile.width/2, tile.height,
+                            0, tile.height * 0.7,
+                            0, tile.height * 0.2
+                        );
                         
                         app.stage.addChild(tile);
-                        tiles.push(tile);
-                        
+                        tiles.push(tile);   
                     }
                 }
                 
@@ -75,6 +83,7 @@
                 for (let i=0; i<tiles.length; i++) {
                     if (tiles[i].clicked) {
                         tiles[i].y += 4;
+                        tiles[i].alpha -= 0.025;
                         
                         if (tiles[i].y > app.height) {
                             app.stage.removeChild(tiles[i]);
