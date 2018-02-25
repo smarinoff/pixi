@@ -24,6 +24,7 @@
             app.renderer.view.style.display = "block";
             app.renderer.autoResize = true;
             app.renderer.resize(window.innerWidth, window.innerHeight);
+            app.renderer.backgroundColor = 0xfff5d3;
             
             let loader = PIXI.loader;
             let tiles = [];
@@ -32,6 +33,8 @@
             let rows = 30;
             let cols = 30;
             let blues = [0x39ccd3, 0x069eb5, 0x07789a, 0xa8d5da, 0x007f9e, 0x1ab2c0, 0x0084a7, 0x49aec2, 0x6bb6d5];
+            let time = 1;
+            let daytime = true;
             
             loader.add("images/tile.png")
                 .load(setup);
@@ -55,6 +58,7 @@
                     for (let i=0; i<cols; i++) {
                         //let type = Math.floor(Math.random() * types);
                         let tile = new PIXI.Sprite(texture);
+                        tile.alpha = 0.75;
                         tile.pivot.set(tile.width/2,tile.height/2);
                         tile.scale.set(0.5, 0.5);
                         tile.neutralY = j*(tile.height * 0.6);
@@ -116,7 +120,19 @@
                     else if (tile.y < tile.neutralY - tile.height * 0.025) {
                         tile.rising = true;
                     }
+                    
+                    if (time % 60 == 0) {
+                        tile.alpha += daytime ? 0.01 : -0.01;
+                    }
                 }
+                
+                //Pass the time
+                time++;
+                
+                if (time % 60 == 0 && (tiles[0].alpha < 0.75 || tiles[0].alpha > 0.9)) {
+                    daytime = !daytime;
+                }
+                
             }
         </script>
     </body>
