@@ -15,8 +15,6 @@
                 }
             
             let app = new PIXI.Application({
-                width: 500,
-                height: 500,
                 antialias: true,
                 resolution: 1
             });
@@ -29,18 +27,19 @@
             
             let loader = PIXI.loader;
             let tiles = [];
-            let textures = [];
-            let types = 10;
+            //let textures = [];
+            //let types = 10;
             let rows = 30;
             let cols = 30;
+            let blues = [0x39ccd3, 0x069eb5, 0x07789a, 0xa8d5da, 0x007f9e, 0x1ab2c0, 0x0084a7, 0x49aec2, 0x6bb6d5];
             
-            loader.add("images/tiles.png")
+            loader.add("images/tile.png")
                 .load(setup);
             
             document.body.appendChild(app.view);
             
             function setup() {
-                
+                /*
                 let base = PIXI.BaseTexture.fromImage("images/tiles.png");
                 
                 for (let t=0; t<types; t++) {
@@ -48,20 +47,28 @@
                     
                     textures[t] = new PIXI.Texture(base, new PIXI.Rectangle(offset*t,0,58,66));
                 }
+                */
+                
+                let texture = PIXI.utils.TextureCache["images/tile.png"];
                 
                 for (let j=0; j < rows; j++) {
                     for (let i=0; i<cols; i++) {
-                        let type = Math.floor(Math.random() * types);
-                        let tile = new PIXI.Sprite(textures[type]);
+                        //let type = Math.floor(Math.random() * types);
+                        let tile = new PIXI.Sprite(texture);
+                        tile.pivot.set(tile.width/2,tile.height/2);
+                        tile.scale.set(0.5, 0.5);
+                        tile.neutralY = j*(tile.height * 0.6);
                         
-                        let y = j*(tile.height - 26) + Math.floor(Math.random()*10);
-                        let x = i*(tile.width - 8);
+                        let y = tile.neutralY + (tile.height * 0.025) * Math.sin(Math.sqrt(Math.random()*i*j)*2 + 5);
+                        let x = i*(tile.width-4);
                         
-                        if (j % 2 != 0) x -= (tile.width - 8)/2;
+                        if (j % 2 != 0) x -= (tile.width - 10)/2;
                         
                         tile.position.set(x, y);
-                        tile.pivot.set(tile.width/2,tile.height/2);
                         tile.clicked = false;
+                        tile.tint = blues[Math.floor(Math.random() * blues.length)];
+                        tile.rising = tile.neutralY > tile.y;
+                        //tile.rising = Math.floor(Math.random() * 2) > 0;
                         
                         //Add interactivity
                         tile.interactive = true;
@@ -87,15 +94,27 @@
             }
             
             function gameLoop(delta) {
+//                for (let i=0; i<tiles.length; i++) {
+//                    if (tiles[i].clicked) {
+//                        tiles[i].y += 4;
+//                        tiles[i].alpha -= 0.025;
+//                        
+//                        if (tiles[i].y > app.height) {
+//                            app.stage.removeChild(tiles[i]);
+//                            delete(tiles[i]);
+//                        }
+//                    }
+//                }
                 for (let i=0; i<tiles.length; i++) {
-                    if (tiles[i].clicked) {
-                        tiles[i].y += 4;
-                        tiles[i].alpha -= 0.025;
-                        
-                        if (tiles[i].y > app.height) {
-                            app.stage.removeChild(tiles[i]);
-                            delete(tiles[i]);
-                        }
+                    let tile = tiles[i];
+                    
+                    tile.y += tile.rising ? 0.05 : -0.05;
+                    
+                    if (tile.y > tile.neutralY + tile.height * 0.025) {
+                        tile.rising = false;
+                    }
+                    else if (tile.y < tile.neutralY - tile.height * 0.025) {
+                        tile.rising = true;
                     }
                 }
             }
