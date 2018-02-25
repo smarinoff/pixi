@@ -21,12 +21,18 @@
                 resolution: 1
             });
             
+            //Make it big
+            app.renderer.view.style.position = "absolute";
+            app.renderer.view.style.display = "block";
+            app.renderer.autoResize = true;
+            app.renderer.resize(window.innerWidth, window.innerHeight);
+            
             let loader = PIXI.loader;
             let tiles = [];
             let textures = [];
             let types = 10;
-            let rows = 13;
-            let cols = 11;
+            let rows = 30;
+            let cols = 30;
             
             loader.add("images/tiles.png")
                 .load(setup);
