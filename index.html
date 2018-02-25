@@ -78,6 +78,9 @@
                         tile.interactive = true;
                         tile.on('pointerdown', function(){                   
                             this.clicked = true;
+                            this.tint = 0x44aa66;
+                            this.alpha = 1;
+                            this.y = this.neutralY;
                         });
                         tile.hitArea = new PIXI.Polygon(
                             tile.width/2, 0,
@@ -112,24 +115,26 @@
                 for (let i=0; i<tiles.length; i++) {
                     let tile = tiles[i];
                     
-                    tile.y += tile.rising ? 0.04 : -0.04;
-                    
-                    if (tile.y > tile.neutralY + tile.height * 0.025) {
-                        tile.rising = false;
-                    }
-                    else if (tile.y < tile.neutralY - tile.height * 0.025) {
-                        tile.rising = true;
-                    }
-                    
-                    if (time % 60 == 0) {
-                        tile.alpha += daytime ? 0.01 : -0.01;
+                    if (!tile.clicked) {
+                        tile.y += tile.rising ? 0.04 : -0.04;
+                        
+                        if (tile.y > tile.neutralY + tile.height * 0.025) {
+                            tile.rising = false;
+                        }
+                        else if (tile.y < tile.neutralY - tile.height * 0.025) {
+                            tile.rising = true;
+                        }
+
+                        if (time % 60 == 0) {
+                            tile.alpha += daytime ? 0.01 : -0.01;
+                        }
                     }
                 }
                 
                 //Pass the time
                 time++;
                 
-                if (time % 60 == 0 && (tiles[0].alpha < 0.75 || tiles[0].alpha > 0.9)) {
+                if (time % (60*15)) {
                     daytime = !daytime;
                 }
                 
